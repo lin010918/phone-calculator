@@ -2,136 +2,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phone Installment Calculator</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #c2f0c2, #a1c4fd);
-    }
-    .container {
-      background-color: rgba(255, 255, 255, 0); /* transparent background */
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      max-width: 100%;
-      margin: 20px auto;
-    }
-    .card {
-      background-color: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 15px;
-    }
-    .plan-buttons {
-      display: flex;
-      margin-bottom: 20px;
-    }
-    .plan-buttons button {
-      flex: 1;
-      padding: 10px;
-      background-color: #2b82f6;
-      color: white;
-      border: none;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .plan-buttons button.active {
-      background-color: #1a56db;
-    }
-    .result ul {
-      padding-left: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Installment Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            font-family: Arial, sans-serif;
+        }
+        .calculator {
+            background-color: white;
+            max-width: 360px;
+            margin: 40px auto;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .calculator h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        .calculator input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .calculator button {
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            background-color: #2c7be5;
+            color: white;
+            cursor: pointer;
+        }
+        .calculator button.active {
+            background-color: #1a6bd6;
+        }
+        .output {
+            margin-top: 20px;
+        }
+        .output strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h2>Phone Installment Calculator</h2>
-      <label for="price">Total Phone Price:</label>
-      <input type="number" id="price" placeholder="Enter price in RWF" />
-      <div class="plan-buttons">
-        <button id="plan1" class="active">One-Month Plan</button>
-        <button id="plan2">12-Week Plan</button>
-      </div>
-      <div class="result" id="result">
-        <h3>One-Month Plan</h3>
-        <p><strong>Down Payment:</strong> <span id="down">RWF</span></p>
-        <p><strong>Loan Amount:</strong> <span id="loan">RWF</span></p>
-        <p><strong>Repayment After 1 Month:</strong> <span id="repay">RWF</span></p>
-      </div>
+    <div class="calculator">
+        <h2>Phone Installment Calculator</h2>
+        <label for="price">Total Phone Price:</label>
+        <input type="number" id="price" placeholder="Enter price in RWF" />
+
+        <div>
+            <button onclick="selectPlan('one')" id="btnOne">One-Month Plan</button>
+            <button onclick="selectPlan('twelve')" id="btnTwelve">12-Week Plan</button>
+        </div>
+
+        <div class="output" id="output"></div>
     </div>
-  </div>
 
-  <script>
-    const priceInput = document.getElementById('price');
-    const result = document.getElementById('result');
-    const btn1 = document.getElementById('plan1');
-    const btn2 = document.getElementById('plan2');
+    <script>
+        let selectedPlan = 'one';
 
-    let activePlan = 'one';
+        function selectPlan(plan) {
+            selectedPlan = plan;
+            document.getElementById('btnOne').classList.remove('active');
+            document.getElementById('btnTwelve').classList.remove('active');
 
-    function update() {
-      const price = parseFloat(priceInput.value);
-      if (isNaN(price)) return;
+            if (plan === 'one') {
+                document.getElementById('btnOne').classList.add('active');
+            } else {
+                document.getElementById('btnTwelve').classList.add('active');
+            }
+            calculate();
+        }
 
-      const down = price * 0.4;
-      const loan = price - down;
+        function calculate() {
+            const price = parseFloat(document.getElementById('price').value);
+            if (!price || price <= 0) {
+                document.getElementById('output').innerHTML = '';
+                return;
+            }
 
-      if (activePlan === 'one') {
-        const repay = loan * 1.2;
-        result.innerHTML = `
-          <h3>One-Month Plan</h3>
-          <p><strong>Down Payment:</strong> ${down.toFixed(0)} RWF</p>
-          <p><strong>Loan Amount:</strong> ${loan.toFixed(0)} RWF</p>
-          <p><strong>Repayment After 1 Month:</strong> ${repay.toFixed(0)} RWF</p>
-        `;
-      } else {
-        const weeklyPrincipal = loan / 12;
-        const weeklyInterest = weeklyPrincipal * 0.5;
-        const totalWeekly = weeklyPrincipal + weeklyInterest;
-        result.innerHTML = `
-          <h3>12-Week Plan</h3>
-          <p><strong>Down Payment:</strong> ${down.toFixed(0)} RWF</p>
-          <p><strong>Loan Amount:</strong> ${loan.toFixed(0)} RWF</p>
-          <p><strong>Each Weekly Payment:</strong></p>
-          <ul>
-            <li>Principal: ${weeklyPrincipal.toFixed(0)} RWF</li>
-            <li>Interest: ${weeklyInterest.toFixed(0)} RWF</li>
-            <li><strong>Total per week: ${totalWeekly.toFixed(0)} RWF</strong></li>
-          </ul>
-        `;
-      }
-    }
+            const down = price * 0.4;
+            const loan = price * 0.6;
+            let output = '';
 
-    priceInput.addEventListener('input', update);
-    btn1.addEventListener('click', () => {
-      activePlan = 'one';
-      btn1.classList.add('active');
-      btn2.classList.remove('active');
-      update();
-    });
-    btn2.addEventListener('click', () => {
-      activePlan = 'twelve';
-      btn2.classList.add('active');
-      btn1.classList.remove('active');
-      update();
-    });
-  </script>
+            if (selectedPlan === 'one') {
+                output += '<strong>One-Month Plan</strong>';
+                output += `<p>Down Payment: <strong>${down.toFixed(0)} RWF</strong></p>`;
+                output += `<p>Loan Amount: <strong>${loan.toFixed(0)} RWF</strong></p>`;
+                output += `<p>Repayment After 1 Month: <strong>${loan.toFixed(0)} RWF</strong></p>`;
+            } else {
+                const interestRate = 0.1;
+                const interest = loan * interestRate;
+                const total = loan + interest;
+                const weekly = total / 12;
+                const principalWeekly = loan / 12;
+                const interestWeekly = interest / 12;
+
+                output += '<strong>12-Week Plan</strong>';
+                output += `<p>Down Payment: <strong>${down.toFixed(0)} RWF</strong></p>`;
+                output += `<p>Loan Amount: <strong>${loan.toFixed(0)} RWF</strong></p>`;
+                output += '<p>Each Weekly Payment:</p>';
+                output += '<ul>';
+                output += `<li>Principal: <strong>${principalWeekly.toFixed(0)} RWF</strong></li>`;
+                output += `<li>Interest: <strong>${interestWeekly.toFixed(0)} RWF</strong></li>`;
+                output += `<li>Total per week: <strong>${weekly.toFixed(0)} RWF</strong></li>`;
+                output += '</ul>';
+            }
+
+            document.getElementById('output').innerHTML = output;
+        }
+
+        document.getElementById('price').addEventListener('input', calculate);
+    </script>
 </body>
 </html>
