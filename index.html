@@ -2,140 +2,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Phone Installment Calculator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 40px 0 0 0;
+      font-family: Arial, sans-serif;
+      background: transparent;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: transparent;
     }
-
     .card {
-      background-color: white;
-      border-radius: 15px;
-      padding: 20px;
-      max-width: 360px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 24px;
       width: 90%;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-width: 360px;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 20px;
     }
-
-    input[type="number"] {
+    input {
       width: 100%;
       padding: 10px;
-      margin-bottom: 15px;
+      font-size: 1rem;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
+      margin-bottom: 16px;
     }
-
-    .button-group {
+    .btn-group {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 16px;
+      justify-content: center;
     }
-
-    .button-group button {
+    .btn {
       flex: 1;
-      padding: 10px;
-      background-color: #1E73E0;
+      background-color: #1d76db;
       color: white;
+      padding: 10px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
     }
-
-    .button-group button:not(:last-child) {
-      margin-right: 10px;
+    .btn:hover {
+      background-color: #155db2;
     }
-
     .result {
-      font-size: 15px;
+      font-size: 0.95rem;
+      line-height: 1.6;
     }
-
     .result b {
       font-weight: bold;
-    }
-
-    ul {
-      margin: 8px 0 0 16px;
-    }
-
-    li {
-      margin-bottom: 5px;
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>Phone Installment Calculator</h2>
-    <label>Total Phone Price:</label>
-    <input type="number" id="price" placeholder="Enter price in RWF" oninput="updateDisplay()" />
-    <div class="button-group">
-      <button onclick="showOneMonth()">One-Month Plan</button>
-      <button onclick="showTwelveWeek()">12-Week Plan</button>
+    <label for="price">Total Phone Price:</label>
+    <input type="number" id="price" placeholder="Enter price in RWF" />
+    <div class="btn-group">
+      <button class="btn" onclick="calculate('one-month')">One-Month Plan</button>
+      <button class="btn" onclick="calculate('twelve-week')">12-Week Plan</button>
     </div>
-    <div class="result" id="resultDisplay"></div>
+    <div class="result" id="result"></div>
   </div>
 
   <script>
-    let currentPlan = 'one';
-
-    function updateDisplay() {
+    function calculate(plan) {
       const price = parseFloat(document.getElementById('price').value);
       if (isNaN(price) || price <= 0) {
-        document.getElementById('resultDisplay').innerHTML = "";
+        document.getElementById('result').innerHTML = "<span style='color:red;'>Please enter a valid price.</span>";
         return;
       }
 
-      const down = price * 0.4;
-      const loan = price * 0.6;
+      const downPayment = price * 0.4;
+      const loanAmount = price - downPayment;
 
-      if (currentPlan === 'one') {
-        document.getElementById('resultDisplay').innerHTML = `
-          <b>One-Month Plan</b><br>
-          Down Payment: <b>${down.toFixed(0)} RWF</b><br>
-          Loan Amount: <b>${loan.toFixed(0)} RWF</b><br>
-          Repayment After 1 Month: <b>${loan.toFixed(0)} RWF</b>
+      if (plan === 'one-month') {
+        document.getElementById('result').innerHTML = `
+          <b>One-Month Plan</b><br/>
+          Down Payment: <b>${downPayment.toFixed(0)} RWF</b><br/>
+          Loan Amount: <b>${loanAmount.toFixed(0)} RWF</b><br/>
+          Repayment After 1 Month: <b>${loanAmount.toFixed(0)} RWF</b>
         `;
       } else {
-        const weeklyPrincipal = loan / 12;
-        const weeklyInterest = weeklyPrincipal * 0.5;
-        const weeklyTotal = weeklyPrincipal + weeklyInterest;
-        document.getElementById('resultDisplay').innerHTML = `
-          <b>12-Week Plan</b><br>
-          Down Payment: <b>${down.toFixed(0)} RWF</b><br>
-          Loan Amount: <b>${loan.toFixed(0)} RWF</b><br>
-          Each Weekly Payment:
+        const principalWeekly = loanAmount / 12;
+        const interestWeekly = principalWeekly * 0.5;
+        const totalWeekly = principalWeekly + interestWeekly;
+        document.getElementById('result').innerHTML = `
+          <b>12-Week Plan</b><br/>
+          Down Payment: <b>${downPayment.toFixed(0)} RWF</b><br/>
+          Loan Amount: <b>${loanAmount.toFixed(0)} RWF</b><br/>
+          Each Weekly Payment:<br/>
           <ul>
-            <li>Principal: <b>${weeklyPrincipal.toFixed(0)} RWF</b></li>
-            <li>Interest: <b>${weeklyInterest.toFixed(0)} RWF</b></li>
-            <li>Total per week: <b>${weeklyTotal.toFixed(0)} RWF</b></li>
+            <li>Principal: <b>${principalWeekly.toFixed(0)} RWF</b></li>
+            <li>Interest: <b>${interestWeekly.toFixed(0)} RWF</b></li>
+            <li>Total per week: <b>${totalWeekly.toFixed(0)} RWF</b></li>
           </ul>
         `;
       }
-    }
-
-    function showOneMonth() {
-      currentPlan = 'one';
-      updateDisplay();
-    }
-
-    function showTwelveWeek() {
-      currentPlan = 'twelve';
-      updateDisplay();
     }
   </script>
 </body>
