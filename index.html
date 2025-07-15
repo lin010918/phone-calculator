@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Phone Installment Calculator</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #f0f8ff, #e6f0fa);
+      font-family: Arial, sans-serif;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      flex:1;
+      padding: 10px;
+      background: #2e86de;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .plan-box {
+      display: none;
+    }
+    ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Phone Installment Calculator</h2>
+    <label>Total Phone Price:</label>
+    <input type="number" id="priceInput" placeholder="Enter price in RWF">
+    <div class="button-group">
+      <button onclick="showPlan('plan1')">One-Month Plan</button>
+      <button onclick="showPlan('plan2')">12-Week Plan</button>
+    </div>
+    <div id="plan1" class="plan-box">
+      <h3>One-Month Plan</h3>
+      <p>Down Payment: <strong><span id="down1"></span> RWF</strong></p>
+      <p>Loan Amount: <strong><span id="loan1"></span> RWF</strong></p>
+      <p>Repayment After 1 Month: <strong><span id="repay1"></span> RWF</strong></p>
+    </div>
+    <div id="plan2" class="plan-box">
+      <h3>12-Week Plan</h3>
+      <p>Down Payment: <strong><span id="down2"></span> RWF</strong></p>
+      <p>Loan Amount: <strong><span id="loan2"></span> RWF</strong></p>
+      <p>Each Weekly Payment:</p>
+      <ul>
+        <li>Principal: <strong><span id="principal2"></span> RWF</strong></li>
+        <li>Interest: <strong><span id="interest2"></span> RWF</strong></li>
+        <li><strong>Total per week: <span id="weeklyTotal2"></span> RWF</strong></li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    function showPlan(planId) {
+      document.getElementById('plan1').style.display = planId === 'plan1' ? 'block' : 'none';
+      document.getElementById('plan2').style.display = planId === 'plan2' ? 'block' : 'none';
+    }
+    const input = document.getElementById('priceInput');
+    input.addEventListener('input', calculate);
+    function calculate() {
+      const price = parseFloat(input.value);
+      if (isNaN(price)) return;
+      const down1 = price * 0.4;
+      const loan1 = price - down1;
+      const repay1 = loan1 * 1.35;
+      document.getElementById('down1').textContent = down1.toFixed(0);
+      document.getElementById('loan1').textContent = loan1.toFixed(0);
+      document.getElementById('repay1').textContent = repay1.toFixed(0);
+
+      const down2 = price * 0.4;
+      const loan2 = price - down2;
+      const totalInterest2 = loan2 * 0.5;
+      const eachPrincipal = loan2 / 12;
+      const eachInterest = totalInterest2 / 12;
+      const totalPerWeek = eachPrincipal + eachInterest;
+
+      document.getElementById('down2').textContent = down2.toFixed(0);
+      document.getElementById('loan2').textContent = loan2.toFixed(0);
+      document.getElementById('principal2').textContent = eachPrincipal.toFixed(0);
+      document.getElementById('interest2').textContent = eachInterest.toFixed(0);
+      document.getElementById('weeklyTotal2').textContent = totalPerWeek.toFixed(0);
+    }
+  </script>
+</body>
+</html>
