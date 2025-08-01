@@ -64,6 +64,10 @@
       cursor: pointer;
     }
 
+    .buttons button.selected {
+      background-color: #d32f2f !important;
+    }
+
     .plan-details {
       text-align: left;
     }
@@ -108,9 +112,9 @@
     <p id="downPaymentWarning"></p>
 
     <div class="buttons">
-      <button onclick="calculate('one')">One-Month Plan</button>
-      <button onclick="calculate('twelve')">12-Week Plan</button>
-      <button onclick="calculate('threeMonth')">3-Month Plan</button>
+      <button onclick="calculate('one', event)">1-Month Plan</button>
+      <button onclick="calculate('threeMonth', event)">3-Month Plan</button>
+      <button onclick="calculate('twelve', event)">12-Week Plan</button>
     </div>
 
     <div class="plan-details" id="result"></div>
@@ -128,7 +132,11 @@
       }
     }
 
-    function calculate(plan) {
+    function calculate(plan, event) {
+      // Highlight the selected button
+      document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('selected'));
+      event.target.classList.add('selected');
+
       const price = parseFloat(document.getElementById("price").value);
       const downInput = parseFloat(document.getElementById("downPayment").value);
       const resultDiv = document.getElementById("result");
@@ -158,7 +166,7 @@
         const repayment = loan + interest;
 
         resultDiv.innerHTML = `
-          <p class="highlight">One-Month Plan</p>
+          <p class="highlight">1-Month Plan</p>
           <p>Down Payment: <span class="highlight">${downInput.toFixed(0)} RWF</span></p>
           <p>Loan Amount: <span class="highlight">${loan.toFixed(0)} RWF</span></p>
           <p>Repayment After 1 Month: <span class="highlight">${repayment.toFixed(0)} RWF</span></p>
