@@ -48,13 +48,14 @@
     .buttons {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
       margin-bottom: 1rem;
     }
 
     .buttons button {
       flex: 1;
       padding: 0.5rem 1rem;
-      margin: 0 2px;
+      margin: 4px;
       font-size: 1rem;
       border: none;
       border-radius: 6px;
@@ -79,33 +80,74 @@
       padding-left: 1.2rem;
       margin: 0.3rem 0;
     }
+
+    #downPaymentWarning {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="calculator">
     <h2>Phone Installment Calculator</h2>
+
     <label for="price">Total Phone Price:</label>
-    <input type="number" id="price" placeholder="Enter price in RWF" />
+    <input type="number" id="price" placeholder="Enter price in RWF" oninput="updateDownHint()" />
+    <p id="autoDownHint" style="color: gray; font-size: 0.9rem;"></p>
+
+    <label for="downPayment">Down Payment:</label>
+    <input type="number" id="downPayment" placeholder="Minimum 40% of phone price" />
+    <p id="downPaymentWarning"></p>
 
     <div class="buttons">
       <button onclick="calculate('one')">One-Month Plan</button>
       <button onclick="calculate('twelve')">12-Week Plan</button>
+      <button onclick="calculate('threeMonth')">3-Month Plan</button>
     </div>
 
     <div class="plan-details" id="result"></div>
   </div>
 
   <script>
-    function calculate(plan) {
+    
+    function updateDownHint() {
       const price = parseFloat(document.getElementById("price").value);
+      const hint = document.getElementById("autoDownHint");
+      if (!isNaN(price) && price > 0) {
+        const suggestion = price * 0.4;
+        hint.textContent = `Minimum required down payment: ${suggestion.toFixed(0)} RWF (40% of phone price)`;
+      } else {
+        hint.textContent = "";
+      }
+    }
+
+function calculate(plan) {
+      const price = parseFloat(document.getElementById("price").value);
+      const downInput = parseFloat(document.getElementById("downPayment").value);
       const resultDiv = document.getElementById("result");
-      if (isNaN(price)) {
-        resultDiv.innerHTML = "<p>Please enter a valid price.</p>";
+      const warning = document.getElementById("downPaymentWarning");
+
+      if (isNaN(price) || price <= 0) {
+        resultDiv.innerHTML = "<p>Please enter a valid phone price.</p>";
+        warning.style.display = "none";
         return;
       }
 
-      const down = price * 0.4;
-      const loan = price - down;
+      const minDownPayment = price * 0.4;
+
+      if (isNaN(downInput) || downInput < minDownPayment - 0.01) {
+        warning.style.display = "block";
+        warning.innerText = `首付必须至少为 ${minDownPayment.toFixed(0)} RWF（手机价格的 40%）`;
+        resultDiv.innerHTML = "";
+        return;
+      } else {
+        warning.style.display = "none";
+      }
+
+      const loan = price - downInput;
 
       if (plan === "one") {
         const interest = loan * 0.35;
@@ -113,25 +155,31 @@
 
         resultDiv.innerHTML = `
           <p class="highlight">One-Month Plan</p>
-          <p>Down Payment: <span class="highlight">${down.toFixed(0)} RWF</span></p>
+          <p>Down Payment: <span class="highlight">${downInput.toFixed(0)} RWF</span></p>
           <p>Loan Amount: <span class="highlight">${loan.toFixed(0)} RWF</span></p>
           <p>Repayment After 1 Month: <span class="highlight">${repayment.toFixed(0)} RWF</span></p>
         `;
-      } else {
+      } else if (plan === "twelve") {
         const weeklyPrincipal = loan / 12;
         const weeklyInterest = weeklyPrincipal * 0.5;
         const weeklyTotal = weeklyPrincipal + weeklyInterest;
 
         resultDiv.innerHTML = `
           <p class="highlight">12-Week Plan</p>
-          <p>Down Payment: <span class="highlight">${down.toFixed(0)} RWF</span></p>
+          <p>Down Payment: <span class="highlight">${downInput.toFixed(0)} RWF</span></p>
           <p>Loan Amount: <span class="highlight">${loan.toFixed(0)} RWF</span></p>
-          <p>Each Weekly Payment:</p>
-          <ul>
-            <li>Principal: <span class="highlight">${weeklyPrincipal.toFixed(0)} RWF</span></li>
-            <li>Interest: <span class="highlight">${weeklyInterest.toFixed(0)} RWF</span></li>
-            <li>Total per week: <span class="highlight">${weeklyTotal.toFixed(0)} RWF</span></li>
-          </ul>
+          <p>Payment Every 7 Days: <span class="highlight">${weeklyTotal.toFixed(0)} RWF</span></p>
+        `;
+      } else if (plan === "threeMonth") {
+        const monthlyPrincipal = loan / 3;
+        const monthlyInterest = monthlyPrincipal * 0.6;
+        const monthlyTotal = monthlyPrincipal + monthlyInterest;
+
+        resultDiv.innerHTML = `
+          <p class="highlight">3-Month Plan</p>
+          <p>Down Payment: <span class="highlight">${downInput.toFixed(0)} RWF</span></p>
+          <p>Loan Amount: <span class="highlight">${loan.toFixed(0)} RWF</span></p>
+          <p>Payment Every 30 Days: <span class="highlight">${monthlyTotal.toFixed(0)} RWF</span></p>
         `;
       }
     }
