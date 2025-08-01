@@ -88,6 +88,11 @@
       margin-bottom: 1rem;
       display: none;
     }
+
+    #autoDownHint {
+      color: gray;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -96,7 +101,7 @@
 
     <label for="price">Total Phone Price:</label>
     <input type="number" id="price" placeholder="Enter price in RWF" oninput="updateDownHint()" />
-    <p id="autoDownHint" style="color: gray; font-size: 0.9rem;"></p>
+    <p id="autoDownHint"></p>
 
     <label for="downPayment">Down Payment:</label>
     <input type="number" id="downPayment" placeholder="Minimum 40% of phone price" />
@@ -112,7 +117,6 @@
   </div>
 
   <script>
-    
     function updateDownHint() {
       const price = parseFloat(document.getElementById("price").value);
       const hint = document.getElementById("autoDownHint");
@@ -124,7 +128,7 @@
       }
     }
 
-function calculate(plan) {
+    function calculate(plan) {
       const price = parseFloat(document.getElementById("price").value);
       const downInput = parseFloat(document.getElementById("downPayment").value);
       const resultDiv = document.getElementById("result");
@@ -140,7 +144,7 @@ function calculate(plan) {
 
       if (isNaN(downInput) || downInput < minDownPayment - 0.01) {
         warning.style.display = "block";
-        warning.innerText = `首付必须至少为 ${minDownPayment.toFixed(0)} RWF（手机价格的 40%）`;
+        warning.innerText = `Down payment must be at least ${minDownPayment.toFixed(0)} RWF (40% of phone price)`;
         resultDiv.innerHTML = "";
         return;
       } else {
