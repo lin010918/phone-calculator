@@ -41,7 +41,7 @@
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     .buttons {
@@ -51,7 +51,6 @@
       margin-bottom: 1rem;
     }
 
-    /* Keep original style but ensure two buttons per row */
     .buttons button {
       flex: 0 0 calc(50% - 8px);
       padding: 0.5rem 1rem;
@@ -80,11 +79,6 @@
       font-weight: bold;
     }
 
-    ul {
-      padding-left: 1.2rem;
-      margin: 0.3rem 0;
-    }
-
     #downPaymentWarning {
       color: red;
       font-size: 0.9rem;
@@ -93,9 +87,12 @@
       display: none;
     }
 
+    /* Reduced spacing between hint and input */
     #autoDownHint {
       color: gray;
       font-size: 0.9rem;
+      margin-top: 0.1rem;
+      margin-bottom: 0.4rem;
     }
   </style>
 </head>
@@ -108,7 +105,7 @@
     <p id="autoDownHint"></p>
 
     <label for="downPayment">Down Payment:</label>
-    <input type="number" id="downPayment" placeholder="Minimum 50% of phone price" />
+    <input type="number" id="downPayment" placeholder="Minimum 40% of phone price" />
     <p id="downPaymentWarning"></p>
 
     <div class="buttons">
@@ -122,14 +119,14 @@
   </div>
 
   <script>
-    let lastPlan = null; // Remember last selected plan
+    let lastPlan = null;
 
     function updateDownHint() {
       const price = parseFloat(document.getElementById("price").value);
       const hint = document.getElementById("autoDownHint");
       if (!isNaN(price) && price > 0) {
-        const suggestion = price * 0.5;
-        hint.textContent = `Minimum required down payment: ${suggestion.toFixed(0)} RWF (50% of phone price)`;
+        const suggestion = price * 0.4;
+        hint.textContent = `Minimum required down payment: ${suggestion.toFixed(0)} RWF (40% of phone price)`;
       } else {
         hint.textContent = "";
       }
@@ -141,19 +138,16 @@
 
     function recalcSelected() {
       if (lastPlan) {
-        // re-run calculation for the last selected plan without changing button states
         calculate(lastPlan, null);
       }
     }
 
     function calculate(plan, event) {
       if (event) {
-        // Highlight the selected button only when user clicks
         document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('selected'));
         event.target.classList.add('selected');
         lastPlan = plan;
       } else {
-        // When recalculating due to input change, keep previous highlight and just update values
         lastPlan = plan || lastPlan;
       }
 
@@ -168,11 +162,11 @@
         return;
       }
 
-      const minDownPayment = price * 0.5; // 50% minimum
+      const minDownPayment = price * 0.4;
 
       if (isNaN(downInput) || downInput < minDownPayment - 0.01) {
         warning.style.display = "block";
-        warning.innerText = `Down payment must be at least ${minDownPayment.toFixed(0)} RWF (50% of phone price)`;
+        warning.innerText = `Down payment must be at least ${minDownPayment.toFixed(0)} RWF (40% of phone price)`;
         resultDiv.innerHTML = "";
         return;
       } else {
@@ -183,55 +177,54 @@
       let html = "";
 
       if (plan === "one") {
-        const rate = 0.25; // 25% total interest
+        const rate = 0.30;
         const interest = loan * rate;
         const repayment = loan + interest;
 
         html = `
-          <p class="highlight">1-Month Plan (25% interest)</p>
+          <p class="highlight">1-Month Plan</p>
           <p>Down Payment: <span class="highlight">${formatRwf(downInput)}</span></p>
           <p>Loan Amount: <span class="highlight">${formatRwf(loan)}</span></p>
           <p>Repayment After 1 Month: <span class="highlight">${formatRwf(repayment)}</span></p>
-        `; // Removed "Total Interest" display per requirements
+        `;
       } else if (plan === "threeMonth") {
-        const totalRate = 0.48; // 48% total interest across period
+        const totalRate = 0.48;
         const totalRepay = loan * (1 + totalRate);
         const monthly = totalRepay / 3;
 
         html = `
-          <p class="highlight">3-Month Plan (Total 48% interest)</p>
+          <p class="highlight">3-Month Plan</p>
           <p>Down Payment: <span class="highlight">${formatRwf(downInput)}</span></p>
           <p>Loan Amount: <span class="highlight">${formatRwf(loan)}</span></p>
           <p>Payment Every Month (x3): <span class="highlight">${formatRwf(monthly)}</span></p>
-        `; // Removed "Total Repayment"
+        `;
       } else if (plan === "twelve") {
-        const totalRate = 0.35; // 35% total interest across period
+        const totalRate = 0.35;
         const totalRepay = loan * (1 + totalRate);
         const weekly = totalRepay / 12;
 
         html = `
-          <p class="highlight">12-Week Plan (Total 35% interest)</p>
+          <p class="highlight">12-Week Plan</p>
           <p>Down Payment: <span class="highlight">${formatRwf(downInput)}</span></p>
           <p>Loan Amount: <span class="highlight">${formatRwf(loan)}</span></p>
           <p>Payment Every Week (x12): <span class="highlight">${formatRwf(weekly)}</span></p>
-        `; // Removed "Total Repayment"
+        `;
       } else if (plan === "sixteen") {
-        const totalRate = 0.50; // 50% total interest across period
+        const totalRate = 0.50;
         const totalRepay = loan * (1 + totalRate);
         const weekly = totalRepay / 16;
 
         html = `
-          <p class="highlight">16-Week Plan (Total 50% interest)</p>
+          <p class="highlight">16-Week Plan</p>
           <p>Down Payment: <span class="highlight">${formatRwf(downInput)}</span></p>
           <p>Loan Amount: <span class="highlight">${formatRwf(loan)}</span></p>
           <p>Payment Every Week (x16): <span class="highlight">${formatRwf(weekly)}</span></p>
-        `; // Removed "Total Repayment"
+        `;
       }
 
       document.getElementById("result").innerHTML = html;
     }
 
-    // Real-time update listeners
     document.getElementById("price").addEventListener("input", recalcSelected);
     document.getElementById("downPayment").addEventListener("input", recalcSelected);
   </script>
