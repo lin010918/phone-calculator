@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,8 +110,8 @@
     <p id="downPaymentWarning"></p>
 
     <div class="buttons">
-      <button onclick="calculate('one', event)">1-Month Plan</button>
-      <button onclick="calculate('threeMonth', event)">3-Month Plan</button>
+      <button onclick="calculate('one', event)">4-Week Plan</button>
+      <button onclick="calculate('threeMonth', event)">8-Week Plan</button>
       <button onclick="calculate('twelve', event)">12-Week Plan</button>
       <button onclick="calculate('sixteen', event)">16-Week Plan</button>
     </div>
@@ -177,29 +178,30 @@
       let html = "";
 
       if (plan === "one") {
-        const rate = 0.30;
+        const rate = 0.40;
         const interest = loan * rate;
-        const repayment = loan + interest;
+        const totalRepay = loan + interest;
+        const weeklyRepayment = totalRepay / 4;  // 每周还款
 
         html = `
-          <p class="highlight">1-Month Plan</p>
+          <p class="highlight">4-Week Plan</p>
           <p>Down Payment: <span class="highlight">${formatRwf(downInput)}</span></p>
           <p>Loan Amount: <span class="highlight">${formatRwf(loan)}</span></p>
-          <p>Repayment After 1 Month: <span class="highlight">${formatRwf(repayment)}</span></p>
+          <p>Payment Every Week (x4): <span class="highlight">${formatRwf(weeklyRepayment)}</span></p>
         `;
       } else if (plan === "threeMonth") {
-        const totalRate = 0.48;
+        const totalRate = 0.50;
         const totalRepay = loan * (1 + totalRate);
-        const monthly = totalRepay / 3;
+        const weekly = totalRepay / 8;
 
         html = `
-          <p class="highlight">3-Month Plan</p>
+          <p class="highlight">8-Week Plan</p>
           <p>Down Payment: <span class="highlight">${formatRwf(downInput)}</span></p>
           <p>Loan Amount: <span class="highlight">${formatRwf(loan)}</span></p>
-          <p>Payment Every Month (x3): <span class="highlight">${formatRwf(monthly)}</span></p>
+          <p>Payment Every Week (x8): <span class="highlight">${formatRwf(weekly)}</span></p>
         `;
       } else if (plan === "twelve") {
-        const totalRate = 0.35;
+        const totalRate = 0.60;
         const totalRepay = loan * (1 + totalRate);
         const weekly = totalRepay / 12;
 
@@ -210,7 +212,7 @@
           <p>Payment Every Week (x12): <span class="highlight">${formatRwf(weekly)}</span></p>
         `;
       } else if (plan === "sixteen") {
-        const totalRate = 0.50;
+        const totalRate = 0.70;
         const totalRepay = loan * (1 + totalRate);
         const weekly = totalRepay / 16;
 
